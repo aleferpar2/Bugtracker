@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Notification;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Notifications\DatabaseNotification;
 
 class NotificationController extends Controller
 {
@@ -25,11 +25,13 @@ class NotificationController extends Controller
     /**
      * Mark a notification as read.
      */
-    public function markAsRead(Notification $notification)
+    public function markAsRead(DatabaseNotification $notification)
     {
-        $this->authorize('update', $notification);
+        if ($notification->notifiable_id !== auth()->id()) {
+            abort(403);
+        }
 
-        $notification->update(['read' => true]);
+        $notification->markAsRead();
 
         return back()->with('success', 'Notificación marcada como leída.');
     }
@@ -39,9 +41,7 @@ class NotificationController extends Controller
      */
     public function markAllAsRead()
     {
-        auth()->user()->notifications()
-            ->where('read', false)
-            ->update(['read' => true]);
+        auth()->user()->unreadNotifications->markAsRead();
 
         return back()->with('success', 'Todas las notificaciones han sido marcadas como leídas.');
     }
@@ -49,9 +49,11 @@ class NotificationController extends Controller
     /**
      * Delete a notification.
      */
-    public function destroy(Notification $notification)
+    public function destroy(DatabaseNotification $notification)
     {
-        $this->authorize('delete', $notification);
+        if ($notification->notifiable_id !== auth()->id()) {
+            abort(403);
+        }
 
         $notification->delete();
 
@@ -73,9 +75,7 @@ class NotificationController extends Controller
      */
     public function unreadCount()
     {
-        $count = auth()->user()->notifications()
-            ->where('read', false)
-            ->count();
+        $count = auth()->user()->unreadNotifications()->count();
 
         return response()->json(['count' => $count]);
     }

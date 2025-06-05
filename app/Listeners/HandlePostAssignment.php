@@ -3,7 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\PostAssigned;
-use App\Models\Notification;
+use App\Notifications\PostAssignedNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
@@ -28,20 +28,16 @@ class HandlePostAssignment implements ShouldQueue
         $users = collect([$post->user, $event->oldAssignee, $event->newAssignee])->filter();
 
         foreach ($users as $user) {
-            if ($user->id === auth()->id()) {
-                continue; // No notificar al usuario que realizó el cambio
-            }
-
-            $message = $this->getMessage($event, $user);
-            if ($message) {
-                Notification::create([
-                    'type' => 'post_assigned',
-                    'notifiable_type' => 'App\Models\Post',
-                    'notifiable_id' => $post->id,
-                    'user_id' => $user->id,
-                    'message' => $message,
-                    'read' => false
-                ]);
+            if ($user && $user->id !== auth()->id()) {
+                $message = $this->getMessage($event, $user);
+                if ($message) {
+                    $user->notify(new PostAssignedNotification(
+                        $post,
+                        $event->oldAssignee,
+                        $event->newAssignee,
+                        $message
+                    ));
+                }
             }
         }
     }

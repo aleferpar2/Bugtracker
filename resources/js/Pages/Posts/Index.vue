@@ -1,133 +1,116 @@
 <template>
     <AppLayout title="Bugs">
-        <template #header>
-            <div class="flex justify-between items-center">
-                <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                    Bugs
-                </h2>
-                <Link
-                    v-if="can.create"
-                    :href="route('posts.create')"
-                    class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"
-                >
-                    Nuevo Bug
-                </Link>
-            </div>
-        </template>
+        <div class="min-h-screen bg-white py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-4 gap-6 mb-12">
+                    <!-- Total -->
+                    <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border border-purple-200 hover:shadow-lg hover:shadow-purple-100/50 transition-all duration-300">
+                        <div class="flex flex-col items-center">
+                            <span class="text-2xl mb-2">🐛</span>
+                            <span class="text-3xl font-bold text-purple-700">{{ stats.total }}</span>
+                            <span class="text-sm text-purple-600">Total</span>
+                        </div>
+                    </div>
 
-        <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <!-- Filtros y Búsqueda -->
-                <div class="bg-white p-6 rounded-lg shadow mb-6">
-                    <form @submit.prevent="filter" class="space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Búsqueda</label>
-                                <input
-                                    v-model="form.search"
-                                    type="text"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                    placeholder="Buscar bugs..."
-                                >
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Categoría</label>
-                                <select
-                                    v-model="form.category"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                >
-                                    <option value="">Todas</option>
-                                    <option v-for="category in categories" :key="category.id" :value="category.id">
-                                        {{ category.name }}
-                                    </option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Estado</label>
-                                <select
-                                    v-model="form.status"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                >
-                                    <option value="">Todos</option>
-                                    <option value="open">Abierto</option>
-                                    <option value="in_progress">En Progreso</option>
-                                    <option value="resolved">Resuelto</option>
-                                    <option value="closed">Cerrado</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Ordenar por</label>
-                                <select
-                                    v-model="form.sort"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                >
-                                    <option value="latest">Más recientes</option>
-                                    <option value="oldest">Más antiguos</option>
-                                    <option value="most_voted">Más votados</option>
-                                    <option value="most_commented">Más comentados</option>
-                                </select>
-                            </div>
+                    <!-- Resueltos -->
+                    <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 border border-green-200 hover:shadow-lg hover:shadow-green-100/50 transition-all duration-300">
+                        <div class="flex flex-col items-center">
+                            <span class="text-2xl mb-2">✅</span>
+                            <span class="text-3xl font-bold text-green-700">{{ stats.resolved }}</span>
+                            <span class="text-sm text-green-600">Resueltos</span>
                         </div>
-                        <div class="flex justify-end">
-                            <button
-                                type="submit"
-                                class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"
-                            >
-                                Filtrar
-                            </button>
+                    </div>
+
+                    <!-- En Progreso -->
+                    <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-6 border border-yellow-200 hover:shadow-lg hover:shadow-yellow-100/50 transition-all duration-300">
+                        <div class="flex flex-col items-center">
+                            <span class="text-2xl mb-2">⚡</span>
+                            <span class="text-3xl font-bold text-yellow-700">{{ stats.in_progress }}</span>
+                            <span class="text-sm text-yellow-600">En Progreso</span>
                         </div>
-                    </form>
+                    </div>
+
+                    <!-- Abiertos -->
+                    <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-6 border border-red-200 hover:shadow-lg hover:shadow-red-100/50 transition-all duration-300">
+                        <div class="flex flex-col items-center">
+                            <span class="text-2xl mb-2">🆘</span>
+                            <span class="text-3xl font-bold text-red-700">{{ stats.open }}</span>
+                            <span class="text-sm text-red-600">Abiertos</span>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Lista de Bugs -->
-                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-                    <div class="p-6">
-                        <div v-if="posts.data.length === 0" class="text-center text-gray-500 py-4">
-                            No se encontraron bugs
-                        </div>
-                        <div v-else class="space-y-4">
-                            <div v-for="post in posts.data" :key="post.id" class="border-b pb-4">
-                                <div class="flex justify-between items-start">
-                                    <div>
-                                        <Link
-                                            :href="route('posts.show', post.id)"
-                                            class="text-lg font-semibold text-indigo-600 hover:text-indigo-800"
-                                        >
+                <div class="space-y-4">
+                    <div v-for="post in posts" :key="post.id" 
+                        class="relative group">
+                        <!-- Glow effect -->
+                        <div class="absolute -inset-0.5 bg-gradient-to-r from-purple-100 to-purple-200 rounded-xl blur-sm opacity-75 group-hover:opacity-100 transition-all duration-300"></div>
+                        
+                        <div class="relative bg-white border border-purple-200 rounded-xl overflow-hidden hover:shadow-lg hover:shadow-purple-100/50 transition-all duration-300">
+                            <div class="flex items-start p-6">
+                                <!-- ID Badge -->
+                                <div class="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg flex flex-col items-center justify-center mr-6 border border-purple-200">
+                                    <span class="text-2xl font-mono text-purple-700">#{{ post.id }}</span>
+                                    <span class="text-xs text-purple-600">{{ post.user.name }}</span>
+                                </div>
+
+                                <!-- Content -->
+                                <div class="flex-1">
+                                    <Link :href="route('posts.show', post.id)" class="block group/title">
+                                        <h2 class="text-xl font-semibold text-gray-900 group-hover/title:text-purple-700 transition-colors mb-2">
                                             {{ post.title }}
-                                        </Link>
-                                        <p class="text-sm text-gray-600 mt-1">{{ post.description }}</p>
-                                        <div class="flex items-center space-x-4 mt-2">
-                                            <span class="text-sm text-gray-500">
-                                                <i class="fas fa-user"></i> {{ post.user.name }}
-                                            </span>
-                                            <span class="text-sm text-gray-500">
-                                                <i class="fas fa-folder"></i> {{ post.categories[0]?.name || 'Sin categoría' }}
-                                            </span>
-                                            <span class="text-sm text-gray-500">
-                                                <i class="fas fa-clock"></i> {{ formatDate(post.created_at) }}
+                                        </h2>
+                                        <p class="text-gray-600 text-sm mb-4">
+                                            {{ post.description }}
+                                        </p>
+                                    </Link>
+
+                                    <!-- Meta info -->
+                                    <div class="flex items-center space-x-4 text-sm">
+                                        <!-- Status -->
+                                        <div class="flex items-center">
+                                            <span class="w-2 h-2 rounded-full mr-2"
+                                                :class="{
+                                                    'bg-green-500': post.status === 'resolved',
+                                                    'bg-yellow-500': post.status === 'in_progress',
+                                                    'bg-red-500': post.status === 'open',
+                                                }"
+                                            ></span>
+                                            <span class="text-gray-600">{{ post.status }}</span>
+                                        </div>
+
+                                        <!-- Priority -->
+                                        <span class="px-2 py-0.5 rounded-full text-xs"
+                                            :class="{
+                                                'bg-red-100 text-red-700': post.priority === 'high',
+                                                'bg-yellow-100 text-yellow-700': post.priority === 'medium',
+                                                'bg-blue-100 text-blue-700': post.priority === 'low'
+                                            }"
+                                        >
+                                            {{ post.priority }}
+                                        </span>
+
+                                        <!-- Categories -->
+                                        <div class="flex space-x-2">
+                                            <span v-for="category in post.categories" :key="category.id"
+                                                class="px-2 py-0.5 rounded-full text-xs bg-purple-100 text-purple-700 border border-purple-200 hover:bg-purple-200 transition-colors">
+                                                {{ category.name }}
                                             </span>
                                         </div>
                                     </div>
-                                    <div class="flex items-center space-x-2">
-                                        <span
-                                            :class="{
-                                                'bg-green-100 text-green-800': post.status === 'resolved',
-                                                'bg-yellow-100 text-yellow-800': post.status === 'in_progress',
-                                                'bg-red-100 text-red-800': post.status === 'open',
-                                                'bg-gray-100 text-gray-800': post.status === 'closed'
-                                            }"
-                                            class="px-2 py-1 rounded-full text-xs font-medium"
-                                        >
-                                            {{ getStatusText(post.status) }}
-                                        </span>
-                                    </div>
+                                </div>
+
+                                <!-- Actions -->
+                                <div class="flex-shrink-0">
+                                    <button class="p-2 text-gray-400 hover:text-purple-700 hover:bg-purple-50 rounded-lg transition-all duration-300">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+                                        </svg>
+                                    </button>
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- Paginación -->
-                        <div class="mt-6">
-                            <Pagination :links="posts.links" />
                         </div>
                     </div>
                 </div>
@@ -137,48 +120,72 @@
 </template>
 
 <script setup>
-import { Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import Pagination from '@/Components/Pagination.vue';
-import { useForm } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { Link } from '@inertiajs/vue3';
 
 const props = defineProps({
-    posts: Object,
-    categories: Array,
-    filters: Object,
-    can: Object
+    posts: {
+        type: Array,
+        default: () => []
+    },
+    categories: {
+        type: Array,
+        default: () => []
+    },
+    filters: {
+        type: Object,
+        default: () => ({})
+    },
+    can: {
+        type: Object,
+        default: () => ({})
+    },
+    stats: {
+        type: Object,
+        default: () => ({
+            total: 0,
+            resolved: 0,
+            in_progress: 0,
+            open: 0
+        })
+    }
 });
 
-const form = useForm({
-    search: props.filters.search || '',
-    category: props.filters.category || '',
-    status: props.filters.status || '',
-    sort: props.filters.sort || 'latest'
-});
+// Helpers para status y priority
+const statusColor = (status) => ({
+    'bg-green-500': status === 'resolved',
+    'bg-yellow-500': status === 'in_progress',
+    'bg-red-500': status === 'open'
+})
 
-const filter = () => {
-    form.get(route('posts.index'), {
-        preserveState: true,
-        preserveScroll: true,
-    });
-};
+const statusText = (status) => ({
+    resolved: '✨ Resuelto',
+    in_progress: '⚡ En Progreso',
+    open: '🔥 Abierto'
+})[status]
 
-const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('es-ES', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
-};
+const priorityColor = (priority) => ({
+    'bg-red-100 text-red-700': priority === 'high',
+    'bg-yellow-100 text-yellow-700': priority === 'medium',
+    'bg-blue-100 text-blue-700': priority === 'low'
+})
 
-const getStatusText = (status) => {
-    const statusMap = {
-        'open': 'Abierto',
-        'in_progress': 'En Progreso',
-        'resolved': 'Resuelto',
-        'closed': 'Cerrado'
-    };
-    return statusMap[status] || status;
-};
-</script> 
+const priorityText = (priority) => ({
+    high: '🚨 Alta',
+    medium: '⚠️ Media', 
+    low: 'ℹ️ Baja'
+})[priority]
+</script>
+
+<style scoped>
+@keyframes gradient {
+    0% { background-position: 0% 50% }
+    50% { background-position: 100% 50% }
+    100% { background-position: 0% 50% }
+}
+
+.animate-gradient {
+    animation: gradient 3s ease infinite;
+    background-size: 200% 200%;
+}
+</style> 

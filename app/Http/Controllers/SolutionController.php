@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Solution;
 use App\Models\Post;
 use App\Notifications\NewSolutionNotification;
-use App\Http\Requests\SolutionRequest;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -14,20 +13,22 @@ class SolutionController extends Controller
     /**
      * Store a newly created solution in storage.
      */
-    public function store(SolutionRequest $request, Post $post)
+    public function store(Request $request, Post $post)
     {
-        $solution = $post->solutions()->create([
-            'description' => $request->description,
-            'status' => $request->status,
-            'code_snippet' => $request->code_snippet,
-            'steps' => $request->steps,
-            'user_id' => auth()->id(),
+        $validated = $request->validate([
+            'description' => 'required|string|min:10|max:5000'
         ]);
 
-        // Notificar al autor del post
-        if ($post->user_id !== auth()->id()) {
-            $post->user->notify(new NewSolutionNotification($solution));
-        }
+        $solution = $post->solutions()->create([
+            'description' => $validated['description'],
+            'user_id' => auth()->id(),
+            'is_accepted' => false,
+        ]);
+
+        // Temporarily disable notifications
+        // if ($post->user_id !== auth()->id()) {
+        //     $post->user->notify(new NewSolutionNotification($solution));
+        // }
 
         return redirect()->back()->with('success', 'Solución propuesta exitosamente.');
     }
@@ -35,16 +36,16 @@ class SolutionController extends Controller
     /**
      * Update the specified solution in storage.
      */
-    public function update(SolutionRequest $request, Post $post, Solution $solution)
+    public function update(Request $request, Post $post, Solution $solution)
     {
         $this->authorize('update', $solution);
 
-        $solution->update([
-            'description' => $request->description,
-            'status' => $request->status,
-            'code_snippet' => $request->code_snippet,
-            'steps' => $request->steps,
+        $validated = $request->validate([
+            'description' => 'required|string|min:10|max:5000',
+            'is_accepted' => 'sometimes|boolean'
         ]);
+
+        $solution->update($validated);
 
         return redirect()->back()->with('success', 'Solución actualizada exitosamente.');
     }
@@ -54,15 +55,19 @@ class SolutionController extends Controller
      */
     public function updateStatus(Request $request, Post $post, Solution $solution)
     {
-        $this->authorize('updateStatus', $solution);
+        $this->authorize('update', $solution);
 
-        $request->validate([
-            'status' => ['required', 'string', 'in:pending,approved,rejected'],
+        $validated = $request->validate([
+            'is_accepted' => 'required|boolean'
         ]);
 
-        $solution->update([
-            'status' => $request->status,
-        ]);
+        // Si se acepta esta solución, rechazar todas las demás
+        if ($validated['is_accepted']) {
+            $post->solutions()->where('id', '!=', $solution->id)->update(['is_accepted' => false]);
+            $post->update(['status' => 'resolved']);
+        }
+
+        $solution->update($validated);
 
         return redirect()->back()->with('success', 'Estado de la solución actualizado exitosamente.');
     }

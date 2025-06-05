@@ -3,7 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\PostStatusChanged;
-use App\Models\Notification;
+use App\Notifications\PostStatusChangedNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
@@ -28,18 +28,13 @@ class HandlePostStatusChange implements ShouldQueue
         $users = collect([$post->user, $post->assignedTo])->filter();
 
         foreach ($users as $user) {
-            if ($user->id === auth()->id()) {
-                continue; // No notificar al usuario que realizó el cambio
+            if ($user && $user->id !== auth()->id()) {
+                $user->notify(new PostStatusChangedNotification(
+                    $post,
+                    $event->oldStatus,
+                    $event->newStatus
+                ));
             }
-
-            Notification::create([
-                'type' => 'post_status_changed',
-                'notifiable_type' => 'App\Models\Post',
-                'notifiable_id' => $post->id,
-                'user_id' => $user->id,
-                'message' => "El estado del post '{$post->title}' ha cambiado de {$event->oldStatus} a {$event->newStatus}",
-                'read' => false
-            ]);
         }
     }
 } 

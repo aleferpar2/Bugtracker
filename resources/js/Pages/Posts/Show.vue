@@ -1,212 +1,205 @@
 <template>
-    <AppLayout :title="post.title">
-        <template #header>
-            <div class="flex justify-between items-center">
-                <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                    {{ post.title }}
-                </h2>
-                <div class="flex space-x-2">
-                    <Link
-                        v-if="can.update"
-                        :href="route('posts.edit', post.id)"
-                        class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"
-                    >
-                        Editar
-                    </Link>
-                    <button
-                        v-if="can.delete"
-                        @click="confirmDelete"
-                        class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                    >
-                        Eliminar
-                    </button>
-                </div>
-            </div>
-        </template>
+    <AppLayout title="Detalles del Bug">
+        <div class="min-h-screen bg-gradient-to-br from-purple-800 via-purple-900 to-purple-950 py-12">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+                <!-- Bug Card -->
+                <div class="relative group mb-8">
+                    <!-- Multi-layer glow effect -->
+                    <div class="absolute -inset-0.5 bg-gradient-to-r from-purple-400/10 via-blue-400/5 to-purple-400/10 rounded-xl blur-md opacity-75"></div>
+                    <div class="absolute -inset-0.5 bg-gradient-to-r from-purple-500/5 to-blue-500/5 rounded-xl blur-lg opacity-50 animate-pulse"></div>
 
-        <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <!-- Información del Bug -->
-                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg mb-6">
-                    <div class="p-6">
-                        <div class="flex justify-between items-start">
-                            <div class="flex-1">
-                                <div class="flex items-center space-x-4 mb-4">
-                                    <span
-                                        :class="{
-                                            'bg-green-100 text-green-800': post.status === 'resolved',
-                                            'bg-yellow-100 text-yellow-800': post.status === 'in_progress',
-                                            'bg-red-100 text-red-800': post.status === 'open',
-                                            'bg-gray-100 text-gray-800': post.status === 'closed'
-                                        }"
-                                        class="px-3 py-1 rounded-full text-sm font-medium"
-                                    >
-                                        {{ getStatusText(post.status) }}
-                                    </span>
-                                    <span
-                                        :class="{
-                                            'bg-blue-100 text-blue-800': post.priority === 'low',
-                                            'bg-yellow-100 text-yellow-800': post.priority === 'medium',
-                                            'bg-orange-100 text-orange-800': post.priority === 'high',
-                                            'bg-red-100 text-red-800': post.priority === 'critical'
-                                        }"
-                                        class="px-3 py-1 rounded-full text-sm font-medium"
-                                    >
-                                        {{ getPriorityText(post.priority) }}
-                                    </span>
+                    <div class="relative bg-purple-950/30 backdrop-blur-md border border-purple-500/5 rounded-xl p-8">
+                        <!-- Header -->
+                        <div class="flex items-start justify-between mb-6">
+                            <div class="flex items-center space-x-4">
+                                <div class="bg-gradient-to-br from-purple-900/30 to-purple-800/30 rounded-lg p-3 border border-purple-500/5">
+                                    <span class="text-2xl text-white/90">#{{ post.id }}</span>
                                 </div>
-                                <p class="text-gray-600 whitespace-pre-line">{{ post.description }}</p>
-                                <div class="mt-4 flex items-center space-x-4 text-sm text-gray-500">
-                                    <span>
-                                        <i class="fas fa-user"></i> {{ post.user.name }}
-                                    </span>
-                                    <span>
-                                        <i class="fas fa-folder"></i> {{ post.category.name }}
-                                    </span>
-                                    <span>
-                                        <i class="fas fa-clock"></i> {{ formatDate(post.created_at) }}
-                                    </span>
+                                <div>
+                                    <h1 class="text-2xl font-bold text-white/90 mb-2">{{ post.title }}</h1>
+                                    <div class="flex items-center space-x-3 text-sm text-white/60">
+                                        <span>Por {{ post.user.name }}</span>
+                                        <span>•</span>
+                                        <span>{{ new Date(post.created_at).toLocaleDateString() }}</span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="flex flex-col items-center space-y-2">
-                                <button
-                                    @click="vote"
+
+                            <!-- Status Badge -->
+                            <div class="flex items-center space-x-2">
+                                <span class="w-2 h-2 rounded-full shadow-glow"
                                     :class="{
-                                        'text-indigo-600': hasVoted,
-                                        'text-gray-400 hover:text-indigo-600': !hasVoted
+                                        'bg-green-400 shadow-green-400/50': post.status === 'resolved',
+                                        'bg-yellow-400 shadow-yellow-400/50': post.status === 'in_progress',
+                                        'bg-red-400 shadow-red-400/50': post.status === 'open',
                                     }"
-                                    class="focus:outline-none"
-                                >
-                                    <i class="fas fa-arrow-up text-xl"></i>
-                                </button>
-                                <span class="text-lg font-semibold">{{ post.votes_count }}</span>
+                                ></span>
+                                <span class="text-white/70">{{ post.status }}</span>
                             </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-6">
+                            <h3 class="text-lg font-medium text-white/80 mb-2">Descripción</h3>
+                            <p class="text-white/70">{{ post.description }}</p>
+                        </div>
+
+                        <!-- Meta Info -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                            <div class="bg-purple-900/20 rounded-lg p-4 border border-purple-500/5">
+                                <span class="text-sm text-white/50">Prioridad</span>
+                                <div class="mt-1 flex items-center">
+                                    <span class="px-2 py-0.5 rounded-full text-sm"
+                                        :class="{
+                                            'bg-gradient-to-r from-red-500/10 to-red-400/10 text-white/70': post.priority === 'high',
+                                            'bg-gradient-to-r from-yellow-500/10 to-yellow-400/10 text-white/70': post.priority === 'medium',
+                                            'bg-gradient-to-r from-blue-500/10 to-blue-400/10 text-white/70': post.priority === 'low'
+                                        }"
+                                    >
+                                        {{ post.priority }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="bg-purple-900/20 rounded-lg p-4 border border-purple-500/5">
+                                <span class="text-sm text-white/50">Categorías</span>
+                                <div class="mt-1 flex flex-wrap gap-2">
+                                    <span v-for="category in post.categories" :key="category.id"
+                                        class="px-2 py-0.5 rounded-full text-xs bg-purple-500/10 text-white/70">
+                                        {{ category.name }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="bg-purple-900/20 rounded-lg p-4 border border-purple-500/5">
+                                <span class="text-sm text-white/50">Tecnología</span>
+                                <div class="mt-1 text-white/70">
+                                    {{ post.technology || 'No especificada' }}
+                                </div>
+                            </div>
+
+                            <div class="bg-purple-900/20 rounded-lg p-4 border border-purple-500/5">
+                                <span class="text-sm text-white/50">Versión</span>
+                                <div class="mt-1 text-white/70">
+                                    {{ post.version || 'No especificada' }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="flex justify-end space-x-4">
+                            <button v-if="can.update"
+                                class="btn btn-secondary"
+                                @click="editPost"
+                            >
+                                Editar
+                            </button>
+                            <button v-if="can.delete"
+                                class="btn btn-danger"
+                                @click="confirmDelete"
+                            >
+                                Eliminar
+                            </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Soluciones -->
-                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg mb-6">
-                    <div class="p-6">
-                        <h3 class="text-lg font-semibold mb-4">Soluciones</h3>
-                        <div v-if="post.solutions.length === 0" class="text-center text-gray-500 py-4">
-                            No hay soluciones propuestas
-                        </div>
-                        <div v-else class="space-y-4">
-                            <div v-for="solution in post.solutions" :key="solution.id" :class="[ 'border-b pb-4', solution.is_accepted ? 'bg-green-50 border-green-400' : '' ]">
-                                <div class="flex justify-between items-start">
-                                    <div class="flex-1">
-                                        <div v-if="editingSolutionId === solution.id">
-                                            <textarea v-model="editSolutionForm.description" rows="3" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></textarea>
-                                            <div class="flex space-x-2 mt-2">
-                                                <button @click="updateSolution(solution)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-3 rounded" :disabled="editSolutionForm.processing">Guardar</button>
-                                                <button @click="cancelEdit" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-3 rounded">Cancelar</button>
-                                            </div>
-                                            <div v-if="editSolutionForm.errors.description" class="text-red-500 text-sm mt-1">{{ editSolutionForm.errors.description }}</div>
-                                        </div>
-                                        <div v-else>
-                                            <p class="text-gray-600 flex items-center">
-                                              <span v-if="solution.is_accepted" class="text-green-600 mr-2" title="Solución aceptada"><i class="fas fa-check-circle"></i></span>
-                                              {{ solution.description }}
-                                            </p>
-                                            <div class="mt-2 flex items-center space-x-4 text-sm text-gray-500">
-                                                <span><i class="fas fa-user"></i> {{ solution.user.name }}</span>
-                                                <span><i class="fas fa-clock"></i> {{ formatDate(solution.created_at) }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="ml-4 flex flex-col space-y-2">
-                                        <button v-if="canAcceptSolution(solution) && !solution.is_accepted" @click="acceptSolution(solution)" class="text-green-600 hover:text-green-800">Aceptar</button>
-                                        <button v-if="canEditOrDeleteSolution(solution) && editingSolutionId !== solution.id" @click="startEdit(solution)" class="text-indigo-600 hover:text-indigo-800">Editar</button>
-                                        <button v-if="canEditOrDeleteSolution(solution)" @click="deleteSolution(solution)" class="text-red-600 hover:text-red-800">Eliminar</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Formulario para nueva solución -->
-                        <form v-if="can.comment" @submit.prevent="submitSolution" class="mt-8">
-                            <div class="mb-4">
-                                <textarea
-                                    v-model="solutionForm.description"
-                                    rows="3"
-                                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                    placeholder="Propón una solución..."
-                                    required
-                                ></textarea>
-                                <div v-if="solutionForm.errors.description" class="text-red-500 text-sm mt-1">
-                                    {{ solutionForm.errors.description }}
-                                </div>
-                            </div>
-                            <div class="flex justify-end">
-                                <button
-                                    type="submit"
-                                    class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                                    :disabled="solutionForm.processing"
-                                >
-                                    Proponer solución
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+                <!-- Comments Section -->
+                <div class="relative group mb-8">
+                    <div class="absolute -inset-0.5 bg-gradient-to-r from-purple-400/10 to-blue-400/10 rounded-xl blur-md opacity-75"></div>
+                    
+                    <div class="relative bg-purple-950/30 backdrop-blur-md border border-purple-500/5 rounded-xl p-6">
+                        <h3 class="text-xl font-semibold text-white/80 mb-6">Comentarios</h3>
 
-                <!-- Comentarios -->
-                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-                    <div class="p-6">
-                        <h3 class="text-lg font-semibold mb-4">Comentarios</h3>
-                        
-                        <!-- Formulario de comentario -->
+                        <!-- Comment Form -->
                         <form v-if="can.comment" @submit.prevent="submitComment" class="mb-6">
-                            <div class="mb-4">
-                                <textarea
-                                    v-model="commentForm.content"
-                                    rows="3"
-                                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                    placeholder="Escribe un comentario..."
-                                    required
-                                ></textarea>
-                                <div v-if="commentForm.errors.content" class="text-red-500 text-sm mt-1">
-                                    {{ commentForm.errors.content }}
-                                </div>
-                            </div>
+                            <textarea
+                                v-model="commentForm.content"
+                                rows="3"
+                                class="input mb-4"
+                                placeholder="Escribe un comentario..."
+                            ></textarea>
                             <div class="flex justify-end">
-                                <button
-                                    type="submit"
-                                    class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"
-                                    :disabled="commentForm.processing"
-                                >
+                                <button type="submit" class="btn btn-primary" :disabled="commentForm.processing">
                                     Comentar
                                 </button>
                             </div>
                         </form>
 
-                        <!-- Lista de comentarios -->
-                        <div v-if="post.comments.length === 0" class="text-center text-gray-500 py-4">
-                            No hay comentarios
-                        </div>
-                        <div v-else class="space-y-4">
-                            <div v-for="comment in post.comments" :key="comment.id" class="border-b pb-4">
-                                <div class="flex justify-between items-start">
-                                    <div class="flex-1">
-                                        <p class="text-gray-600">{{ comment.content }}</p>
-                                        <div class="mt-2 flex items-center space-x-4 text-sm text-gray-500">
-                                            <span>
-                                                <i class="fas fa-user"></i> {{ comment.user.name }}
-                                            </span>
-                                            <span>
-                                                <i class="fas fa-clock"></i> {{ formatDate(comment.created_at) }}
-                                            </span>
-                                        </div>
+                        <!-- Comments List -->
+                        <div class="space-y-4">
+                            <div v-for="comment in post.comments" :key="comment.id"
+                                class="bg-purple-900/20 rounded-lg p-4 border border-purple-500/5">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="font-medium text-white/80">{{ comment.user.name }}</span>
+                                        <span class="text-sm text-white/50">{{ new Date(comment.created_at).toLocaleDateString() }}</span>
                                     </div>
-                                    <div v-if="can.delete" class="ml-4">
-                                        <button
-                                            @click="deleteComment(comment)"
-                                            class="text-red-600 hover:text-red-800"
-                                        >
-                                            <i class="fas fa-trash"></i>
+                                    <button v-if="can.delete" @click="deleteComment(comment)"
+                                        class="text-white/50 hover:text-white/80">
+                                        <span class="sr-only">Eliminar</span>
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <p class="text-white/70">{{ comment.content }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Solutions Section -->
+                <div class="relative group">
+                    <div class="absolute -inset-0.5 bg-gradient-to-r from-purple-400/10 to-blue-400/10 rounded-xl blur-md opacity-75"></div>
+                    
+                    <div class="relative bg-purple-950/30 backdrop-blur-md border border-purple-500/5 rounded-xl p-6">
+                        <h3 class="text-xl font-semibold text-white/80 mb-6">Soluciones Propuestas</h3>
+
+                        <!-- Solution Form -->
+                        <form @submit.prevent="submitSolution" class="mb-6">
+                            <textarea
+                                v-model="solutionForm.description"
+                                rows="3"
+                                class="input mb-4"
+                                placeholder="Propón una solución..."
+                            ></textarea>
+                            <div class="flex justify-end">
+                                <button type="submit" class="btn btn-primary" :disabled="solutionForm.processing">
+                                    Proponer Solución
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Solutions List -->
+                        <div class="space-y-4">
+                            <div v-for="solution in post.solutions" :key="solution.id"
+                                class="bg-purple-900/20 rounded-lg p-4 border border-purple-500/5">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="font-medium text-white/80">{{ solution.user.name }}</span>
+                                        <span class="text-sm text-white/50">{{ new Date(solution.created_at).toLocaleDateString() }}</span>
+                                        <span v-if="solution.is_accepted"
+                                            class="px-2 py-0.5 rounded-full text-xs bg-green-500/20 text-green-300">
+                                            Aceptada ✓
+                                        </span>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <button v-if="!solution.is_accepted && can.update"
+                                            @click="acceptSolution(solution)"
+                                            class="text-white/50 hover:text-white/80">
+                                            Aceptar
+                                        </button>
+                                        <button v-if="can.delete" @click="deleteSolution(solution)"
+                                            class="text-white/50 hover:text-white/80">
+                                            <span class="sr-only">Eliminar</span>
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                            </svg>
                                         </button>
                                     </div>
                                 </div>
+                                <p class="text-white/70">{{ solution.description }}</p>
                             </div>
                         </div>
                     </div>
@@ -217,10 +210,12 @@
 </template>
 
 <script setup>
-import { Link, useForm } from '@inertiajs/vue3';
+import { Link, useForm, usePage, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { ref, computed } from 'vue';
+import axios from 'axios';
 
+const page = usePage();
 const props = defineProps({
     post: Object,
     can: Object
@@ -268,74 +263,71 @@ const getPriorityText = (priority) => {
 };
 
 const vote = () => {
-    if (!hasVoted.value) {
-        axios.post(route('posts.vote', props.post.id))
-            .then(() => {
-                hasVoted.value = true;
-                props.post.votes_count++;
-            });
-    } else {
-        axios.delete(route('posts.vote', props.post.id))
-            .then(() => {
-                hasVoted.value = false;
-                props.post.votes_count--;
-            });
-    }
+    // Por ahora deshabilitar votación hasta implementar rutas
+    console.log('Votación no implementada aún');
 };
 
 const submitComment = () => {
+    console.log('Submitting comment:', commentForm.content);
+    console.log('Post ID:', props.post.id);
+    console.log('Route:', route('posts.comments.store', props.post.id));
+    
     commentForm.post(route('posts.comments.store', props.post.id), {
         preserveScroll: true,
         onSuccess: () => {
+            console.log('Comment submitted successfully');
             commentForm.reset();
         },
+        onError: (errors) => {
+            console.error('Comment submission failed:', errors);
+        }
     });
 };
 
 const deleteComment = (comment) => {
     if (confirm('¿Estás seguro de que quieres eliminar este comentario?')) {
-        axios.delete(route('posts.comments.destroy', [props.post.id, comment.id]))
-            .then(() => {
-                const index = props.post.comments.findIndex(c => c.id === comment.id);
-                if (index > -1) {
-                    props.post.comments.splice(index, 1);
-                }
-            });
+        router.delete(route('posts.comments.destroy', [props.post.id, comment.id]), {
+            preserveScroll: true,
+        });
     }
 };
 
 const acceptSolution = (solution) => {
     if (confirm('¿Estás seguro de que quieres aceptar esta solución?')) {
-        axios.put(route('posts.solutions.update', [props.post.id, solution.id]), { is_accepted: true })
-            .then(() => {
-                props.post.solutions.forEach(s => { s.is_accepted = false; });
-                solution.is_accepted = true;
-                props.post.status = 'resolved';
-            });
+        router.patch(route('posts.solutions.update-status', [props.post.id, solution.id]), 
+            { is_accepted: true },
+            { preserveScroll: true }
+        );
     }
 };
 
 const confirmDelete = () => {
     if (confirm('¿Estás seguro de que quieres eliminar este bug?')) {
-        axios.delete(route('posts.destroy', props.post.id))
-            .then(() => {
-                window.location.href = route('posts.index');
-            });
+        router.delete(route('posts.destroy', props.post.id));
     }
 };
 
 function submitSolution() {
+    console.log('Submitting solution:', solutionForm.description);
+    console.log('Post ID:', props.post.id);
+    console.log('Route:', route('posts.solutions.store', props.post.id));
+    
     solutionForm.post(route('posts.solutions.store', props.post.id), {
         preserveScroll: true,
         onSuccess: () => {
+            console.log('Solution submitted successfully');
             solutionForm.reset();
         },
+        onError: (errors) => {
+            console.error('Solution submission failed:', errors);
+        }
     });
 }
 
 function canEditOrDeleteSolution(solution) {
     // El usuario puede editar/eliminar si es el autor o admin
-    return solution.user.id === $page.props.auth.user.id || $page.props.auth.user.role === 'admin';
+    const user = page.props.auth?.user;
+    return user && (solution.user.id === user.id || user.role === 'admin');
 }
 
 function startEdit(solution) {
@@ -360,17 +352,58 @@ function updateSolution(solution) {
 
 function deleteSolution(solution) {
     if (confirm('¿Estás seguro de que quieres eliminar esta solución?')) {
-        axios.delete(route('posts.solutions.destroy', [props.post.id, solution.id]))
-            .then(() => {
-                // Elimina la solución del array localmente para feedback inmediato
-                const idx = props.post.solutions.findIndex(s => s.id === solution.id);
-                if (idx > -1) props.post.solutions.splice(idx, 1);
-            });
+        router.delete(route('posts.solutions.destroy', [props.post.id, solution.id]), {
+            preserveScroll: true,
+        });
     }
 }
 
 function canAcceptSolution(solution) {
     // Solo el autor del post o admin puede aceptar una solución
-    return $page.props.auth.user.id === props.post.user.id || $page.props.auth.user.role === 'admin';
+    const user = page.props.auth?.user;
+    return user && (user.id === props.post.user.id || user.role === 'admin');
 }
-</script> 
+</script>
+
+<style scoped>
+.input {
+    @apply w-full bg-purple-900/20 border border-purple-500/5 rounded-lg px-4 py-2.5 
+        text-white/80 placeholder-white/30
+        focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/20 
+        hover:bg-purple-900/30 transition-all duration-300;
+}
+
+.btn {
+    @apply px-6 py-2.5 rounded-lg font-medium transition-all duration-300
+        disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-primary {
+    @apply bg-gradient-to-r from-purple-500/80 via-blue-500/80 to-purple-500/80 
+        text-white/90 hover:from-purple-500/90 hover:via-blue-500/90 hover:to-purple-500/90
+        hover:shadow-lg hover:shadow-purple-500/10;
+}
+
+.btn-secondary {
+    @apply bg-purple-500/5 text-white/70
+        hover:bg-purple-500/10 hover:text-white/80;
+}
+
+.btn-danger {
+    @apply bg-gradient-to-r from-red-500/20 to-red-600/20 text-white/70
+        hover:from-red-500/30 hover:to-red-600/30 hover:text-white/80;
+}
+
+.shadow-glow {
+    box-shadow: 0 0 8px currentColor;
+}
+
+@keyframes subtle-pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 0.3; }
+}
+
+.animate-subtle-pulse {
+    animation: subtle-pulse 3s ease-in-out infinite;
+}
+</style> 

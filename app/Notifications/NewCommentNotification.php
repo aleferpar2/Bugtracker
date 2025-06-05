@@ -26,7 +26,7 @@ class NewCommentNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['database', 'mail'];
+        return ['database']; // Solo base de datos, sin email por ahora
     }
 
     /**

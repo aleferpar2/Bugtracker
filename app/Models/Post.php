@@ -66,9 +66,4 @@ class Post extends Model
     {
         return $this->belongsToMany(Category::class);
     }
-
-    public function notifications()
-    {
-        return $this->morphMany(Notification::class, 'notifiable');
-    }
 }

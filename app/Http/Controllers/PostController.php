@@ -15,57 +15,79 @@ use Illuminate\Support\Facades\Log;
 
 class PostController extends Controller
 {
+    // TODO: Implementar cache para optimizar queries frecuentes
+    // FIXME: La paginación está rota en móvil 🤔
+    
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $query = Post::with(['user', 'categories']);
+        // Get posts con sus relaciones (optimizar esto después)
+        $query = Post::with(['user', 'categories', 'solutions']);
 
-        // Aplicar filtros si existen
-        if ($request->filled('search')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('title', 'like', '%' . $request->search . '%')
-                  ->orWhere('description', 'like', '%' . $request->search . '%');
-            });
+        // Búsqueda y filtros 🔍
+        if ($request->search) {
+            $query->where(fn($q) => 
+                $q->where('title', 'like', "%{$request->search}%")
+                  ->orWhere('description', 'like', "%{$request->search}%")
+            );
         }
 
-        if ($request->filled('category')) {
-            $query->whereHas('categories', function ($q) use ($request) {
-                $q->where('categories.id', $request->category);
-            });
-        }
+        // Filtro por categoría (si existe)
+        $request->category && $query->whereHas('categories', 
+            fn($q) => $q->where('categories.id', $request->category)
+        );
 
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
+        // Status filter
+        $request->status && $query->where('status', $request->status);
 
-        // Aplicar ordenamiento
-        switch ($request->get('sort', 'latest')) {
-            case 'oldest':
-                $query->oldest();
-                break;
-            case 'most_voted':
-                $query->orderBy('votes_count', 'desc');
-                break;
-            case 'most_commented':
-                $query->withCount('comments')->orderBy('comments_count', 'desc');
-                break;
-            default:
-                $query->latest();
-                break;
-        }
+        // Sort posts - maybe add more options later?
+        match($request->sort ?? 'latest') {
+            'oldest' => $query->oldest(),
+            'most_voted' => $query->orderBy('votes_count', 'desc'),
+            'most_commented' => $query->withCount('comments')
+                                    ->orderBy('comments_count', 'desc'),
+            default => $query->latest()
+        };
 
-        $posts = $query->paginate(10);
-        $posts->appends($request->all());
+        // Transform posts para el frontend
+        $posts = $query->get()->map(fn($post) => [
+            'id' => $post->id,
+            'title' => $post->title,
+            'description' => $post->description,
+            'status' => $post->status,
+            'priority' => $post->priority,
+            'user' => [
+                'id' => $post->user->id,
+                'name' => $post->user->name
+            ],
+            'categories' => $post->categories->map(fn($cat) => [
+                'id' => $cat->id,
+                'name' => $cat->name
+            ])->values(),
+            'solutions' => $post->solutions->map(fn($sol) => [
+                'id' => $sol->id,
+                'description' => $sol->description,
+                'is_accepted' => $sol->is_accepted
+            ])->values(),
+            'created_at' => $post->created_at
+        ]);
+
+        // Quick stats para el dashboard
+        $stats = [
+            'total' => Post::count(), // cachear esto después
+            'resolved' => Post::where('status', 'resolved')->count(),
+            'in_progress' => Post::where('status', 'in_progress')->count(),
+            'open' => Post::where('status', 'open')->count(),
+        ];
 
         return Inertia::render('Posts/Index', [
             'posts' => $posts,
-            'categories' => Category::all(),
+            'categories' => Category::select('id', 'name')->get(),
             'filters' => $request->only(['search', 'category', 'status', 'sort']),
-            'can' => [
-                'create' => true, // Por ahora todos pueden crear
-            ],
+            'can' => ['create' => auth()->check()],
+            'stats' => $stats,
         ]);
     }
 
@@ -74,7 +96,10 @@ class PostController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('Posts/Create', [
+            'categories' => Category::all(),
+            'priorities' => Post::PRIORITIES,
+        ]);
     }
 
     /**
@@ -82,8 +107,28 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        // Simular la creación de un bug
-        return redirect()->route('posts.index')->with('success', 'Bug creado exitosamente (simulado).');
+        $data = $request->validate([
+            'title' => 'required|string|max:255|unique:posts',
+            'description' => 'required|string|min:10',
+            'category_id' => 'required|exists:categories,id',
+            'priority' => 'required|in:low,medium,high,critical',
+            'technology' => 'nullable|string|max:100',
+            'application' => 'nullable|string|max:100',
+            'version' => 'nullable|string|max:50',
+            'year' => 'nullable|string|max:4'
+        ]);
+
+        $post = Post::create([
+            ...$data,
+            'status' => 'open',
+            'user_id' => auth()->id(),
+        ]);
+
+        $post->categories()->attach($data['category_id']);
+
+        return redirect()
+            ->route('posts.show', $post)
+            ->with('success', 'Bug reportado correctamente');
     }
 
     /**
@@ -93,20 +138,19 @@ class PostController extends Controller
     {
         $post->load(['user', 'categories', 'comments.user', 'solutions.user']);
         
-        // Agregar datos adicionales que espera el componente
-        $postData = $post->toArray();
-        $postData['category'] = $post->categories->first(); // El componente espera un objeto category
-        $postData['has_voted'] = false; // Por defecto no ha votado
-        $postData['votes_count'] = $post->votes_count ?? 0;
-        $postData['solutions'] = $post->solutions ?? [];
-        $postData['comments'] = $post->comments ?? [];
-
         return Inertia::render('Posts/Show', [
-            'post' => $postData,
+            'post' => [
+                ...$post->toArray(),
+                'category' => $post->categories->first(),
+                'has_voted' => false,
+                'votes_count' => $post->votes_count ?? 0,
+                'solutions' => $post->solutions ?? [],
+                'comments' => $post->comments ?? [],
+            ],
             'can' => [
-                'update' => true, // Por ahora todos pueden actualizar
-                'delete' => true, // Por ahora todos pueden eliminar  
-                'comment' => true, // Por ahora todos pueden comentar
+                'update' => auth()->id() === $post->user_id,
+                'delete' => auth()->id() === $post->user_id,
+                'comment' => auth()->check(),
             ],
         ]);
     }
@@ -218,3 +262,4 @@ class PostController extends Controller
         ]);
     }
 }
+

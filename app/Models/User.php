@@ -49,6 +49,15 @@ class User extends Authenticatable
     ];
 
     /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = [
+        'profile_photo_url',
+    ];
+
+    /**
      * The roles that belong to the user.
      */
     public function roles()
@@ -96,16 +105,16 @@ class User extends Authenticatable
         return $this->hasMany(Solution::class);
     }
 
-    /**
-     * The notifications that belong to the user.
-     */
-    public function notifications()
-    {
-        return $this->hasMany(Notification::class);
-    }
-
     public function topics()
     {
         return $this->hasMany(\App\Models\Topic::class);
+    }
+
+    /**
+     * Get the profile photo URL attribute.
+     */
+    public function getProfilePhotoUrlAttribute()
+    {
+        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&color=7F9CF5&background=EBF4FF';
     }
 }

@@ -11,6 +11,7 @@ use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\Api\CommunityController as ApiCommunityController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Notifications\DatabaseNotification;
 use Inertia\Inertia;
 
 /*
@@ -25,16 +26,15 @@ use Inertia\Inertia;
 */
 
 // Rutas públicas
-Route::get('/', function () {
-    return Inertia::render('Home');
-})->name('home');
+Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 // Rutas que requieren autenticación
 Route::middleware(['auth', 'verified'])->group(function () {
+    // Home para usuarios autenticados
+    Route::get('/home', [App\Http\Controllers\HomeController::class, 'dashboard'])->name('home.dashboard');
+    
     // Dashboard
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
     // Perfil de usuario
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -65,9 +65,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Notificaciones
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
-    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
+    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead')->whereUuid('notification');
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
-    Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
+    Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy'])->name('notifications.destroy')->whereUuid('notification');
     Route::delete('/notifications', [NotificationController::class, 'destroyAll'])->name('notifications.destroyAll');
     Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unreadCount');
     Route::get('/notifications/latest', [NotificationController::class, 'latest'])->name('notifications.latest');
@@ -104,10 +104,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/advanced', [PostController::class, 'advancedSearch'])->name('advanced');
     });
 
-    // Comunidad (placeholder)
-    Route::get('/community', function () {
-        return Inertia::render('Community/Index');
-    })->name('community.index');
+    // Comunidad
+    Route::get('/community', [CommunityController::class, 'index'])->name('community.index');
+    Route::get('/community/create', [CommunityController::class, 'create'])->name('community.create');
+    Route::post('/community', [CommunityController::class, 'store'])->name('community.store');
+    Route::get('/community/{topic}', [CommunityController::class, 'show'])->name('community.show');
+    Route::post('/community/{topic}/replies', [CommunityController::class, 'storeReply'])->name('community.replies.store');
 
     Route::get('/bugs/advanced', function () {
         return Inertia::render('Posts/AdvancedSearch');
@@ -120,23 +122,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/stackoverflow/result/{questionId}', function ($questionId) {
         return Inertia::render('Posts/StackOverflowResult', ['questionId' => $questionId]);
     })->name('posts.stackoverflow.result');
-});
-
-// Rutas de autenticación
-require __DIR__.'/auth.php';
-
-// Rutas de la comunidad
-Route::middleware(['auth:sanctum', 'verified'])->group(function () {
-    Route::get('/community', [CommunityController::class, 'index'])->name('community.index');
-    Route::get('/community/create', [CommunityController::class, 'create'])->name('community.create');
-    Route::post('/community', [CommunityController::class, 'store'])->name('community.store');
-    Route::get('/community/{topic}', [CommunityController::class, 'show'])->name('community.show');
     
     // Rutas de API
     Route::prefix('api')->name('api.')->group(function () {
         Route::get('/community/topics', [ApiCommunityController::class, 'topics'])->name('community.topics');
         Route::get('/community/categories', [ApiCommunityController::class, 'categories'])->name('community.categories');
         Route::get('/community/{topic}/replies', [ApiCommunityController::class, 'replies'])->name('community.replies');
-        Route::post('/community/{topic}/replies', [ApiCommunityController::class, 'storeReply'])->name('community.replies.store');
     });
 });
+
+// Rutas de autenticación
+require __DIR__.'/auth.php';

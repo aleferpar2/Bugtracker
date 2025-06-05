@@ -112,7 +112,7 @@
 
 <script setup>
 import { ref, watch } from 'vue';
-import { Link } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import Pagination from '@/Components/Pagination.vue';
 
@@ -124,12 +124,16 @@ const props = defineProps({
   categories: {
     type: Array,
     required: true
+  },
+  filters: {
+    type: Object,
+    default: () => ({})
   }
 });
 
-const search = ref('');
-const selectedCategory = ref('');
-const sortBy = ref('recent');
+const search = ref(props.filters.search || '');
+const selectedCategory = ref(props.filters.category || '');
+const sortBy = ref(props.filters.sort || 'recent');
 
 const filterTopics = () => {
   router.get(route('community.index'), {

@@ -103,7 +103,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import { Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import Pagination from '@/Components/Pagination.vue';
@@ -113,33 +113,21 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  replies: {
+    type: Object,
+    required: true,
+  },
 });
-
-const replies = ref({ data: [], links: [] });
 
 const replyForm = useForm({
   content: '',
 });
 
-const getReplies = async () => {
-  try {
-    const response = await axios.get(route('api.community.replies', props.topic.id));
-    replies.value = response.data;
-  } catch (error) {
-    console.error('Error fetching replies:', error);
-  }
-};
-
 const submitReply = () => {
   replyForm.post(route('community.replies.store', props.topic.id), {
     onSuccess: () => {
       replyForm.reset();
-      getReplies();
     },
   });
 };
-
-onMounted(() => {
-  getReplies();
-});
 </script> 

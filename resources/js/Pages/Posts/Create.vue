@@ -1,152 +1,156 @@
 <template>
     <AppLayout title="Nuevo Bug">
-        <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Nuevo Bug
-            </h2>
-        </template>
+        <div class="min-h-screen bg-gradient-to-br from-purple-800 via-purple-900 to-purple-950 py-12">
+            <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                <!-- Header -->
+                <div class="text-center mb-8">
+                    <h1 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-purple-300">
+                        Reportar Bug 🐛
+                    </h1>
+                    <p class="mt-2 text-purple-300/70">
+                        Ayúdanos a mejorar describiendo el problema en detalle
+                    </p>
+                </div>
 
-        <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-                    <div class="p-6">
-                        <form @submit.prevent="submit">
-                            <div class="space-y-6">
-                                <!-- Título -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Título</label>
-                                    <input
-                                        v-model="form.title"
-                                        type="text"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        required
-                                    >
-                                    <div v-if="form.errors.title" class="text-red-500 text-sm mt-1">
-                                        {{ form.errors.title }}
-                                    </div>
-                                </div>
+                <!-- Form card with enhanced effects -->
+                <div class="relative group">
+                    <!-- Multi-layer glow effect -->
+                    <div class="absolute -inset-0.5 bg-gradient-to-r from-purple-400/10 via-blue-400/5 to-purple-400/10 rounded-xl blur-md opacity-75"></div>
+                    <div class="absolute -inset-0.5 bg-gradient-to-r from-purple-500/5 to-blue-500/5 rounded-xl blur-lg opacity-50 animate-pulse"></div>
+                    
+                    <div class="relative bg-purple-950/30 backdrop-blur-md border border-purple-500/5 rounded-xl p-6 shadow-lg">
+                        <form @submit.prevent="submitBug" class="space-y-6">
+                            <!-- Form fields with improved styling -->
+                            <div>
+                                <label class="label">Título del Bug</label>
+                                <input
+                                    v-model="form.title"
+                                    type="text"
+                                    class="input"
+                                    placeholder="Ej: App crashea al subir fotos PNG"
+                                    :class="{ 'error': form.errors.title }"
+                                />
+                                <p v-if="form.errors.title" class="error-text">{{ form.errors.title }}</p>
+                            </div>
 
-                                <!-- Descripción -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Descripción</label>
-                                    <textarea
-                                        v-model="form.description"
-                                        rows="4"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        required
-                                    ></textarea>
-                                    <div v-if="form.errors.description" class="text-red-500 text-sm mt-1">
-                                        {{ form.errors.description }}
-                                    </div>
-                                </div>
+                            <div>
+                                <label class="label">Descripción</label>
+                                <textarea
+                                    v-model="form.description"
+                                    rows="4"
+                                    class="input"
+                                    placeholder="Describe el problema, pasos para reproducirlo, y comportamiento esperado..."
+                                    :class="{ 'error': form.errors.description }"
+                                ></textarea>
+                                <p v-if="form.errors.description" class="error-text">{{ form.errors.description }}</p>
+                            </div>
 
-                                <!-- Categoría -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700">Categoría</label>
+                                    <label class="label">Categoría</label>
                                     <select
                                         v-model="form.category_id"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        required
+                                        class="input"
+                                        :class="{ 'error': form.errors.category_id }"
                                     >
                                         <option value="">Selecciona una categoría</option>
-                                        <option v-for="category in categories" :key="category.id" :value="category.id">
-                                            {{ category.name }}
+                                        <option v-for="cat in categories" :key="cat.id" :value="cat.id">
+                                            {{ cat.name }}
                                         </option>
                                     </select>
-                                    <div v-if="form.errors.category_id" class="text-red-500 text-sm mt-1">
-                                        {{ form.errors.category_id }}
-                                    </div>
+                                    <p v-if="form.errors.category_id" class="error-text">{{ form.errors.category_id }}</p>
                                 </div>
 
-                                <!-- Prioridad -->
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700">Prioridad</label>
+                                    <label class="label">Prioridad</label>
                                     <select
                                         v-model="form.priority"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        required
+                                        class="input"
+                                        :class="{ 'error': form.errors.priority }"
                                     >
-                                        <option value="low">Baja</option>
-                                        <option value="medium">Media</option>
-                                        <option value="high">Alta</option>
-                                        <option value="critical">Crítica</option>
+                                        <option value="">Selecciona la prioridad</option>
+                                        <option value="low">🟢 Baja - Puede esperar</option>
+                                        <option value="medium">🟡 Media - Afecta algunas funciones</option>
+                                        <option value="high">🔴 Alta - Bloquea funcionalidad</option>
+                                        <option value="critical">💀 Crítica - Sistema caído</option>
                                     </select>
-                                    <div v-if="form.errors.priority" class="text-red-500 text-sm mt-1">
-                                        {{ form.errors.priority }}
-                                    </div>
+                                    <p v-if="form.errors.priority" class="error-text">{{ form.errors.priority }}</p>
                                 </div>
+                            </div>
 
-                                <!-- Tecnología -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Tecnología</label>
-                                    <input
-                                        v-model="form.technology"
-                                        type="text"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        placeholder="Ej: PHP, JavaScript, Python..."
-                                    >
-                                    <div v-if="form.errors.technology" class="text-red-500 text-sm mt-1">
-                                        {{ form.errors.technology }}
-                                    </div>
-                                </div>
-                                <!-- Aplicación -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Aplicación</label>
-                                    <input
-                                        v-model="form.application"
-                                        type="text"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        placeholder="Ej: Visual Studio Code, XAMPP, etc."
-                                    >
-                                    <div v-if="form.errors.application" class="text-red-500 text-sm mt-1">
-                                        {{ form.errors.application }}
-                                    </div>
-                                </div>
-                                <!-- Versión -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Versión</label>
-                                    <input
-                                        v-model="form.version"
-                                        type="text"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        placeholder="Ej: 1.0.0, 2024, etc."
-                                    >
-                                    <div v-if="form.errors.version" class="text-red-500 text-sm mt-1">
-                                        {{ form.errors.version }}
-                                    </div>
-                                </div>
-                                <!-- Año -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Año</label>
-                                    <input
-                                        v-model="form.year"
-                                        type="number"
-                                        min="1990"
-                                        max="2100"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        placeholder="Ej: 2024"
-                                    >
-                                    <div v-if="form.errors.year" class="text-red-500 text-sm mt-1">
-                                        {{ form.errors.year }}
-                                    </div>
-                                </div>
+                            <!-- Info técnica section with gradient border -->
+                            <div class="relative">
+                                <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-purple-500/5 via-blue-500/10 to-purple-500/5"></div>
+                                <div class="pt-6">
+                                    <h3 class="text-lg font-medium text-white/80 mb-4">
+                                        Info Técnica
+                                        <span class="text-sm text-white/40">(opcional)</span>
+                                    </h3>
 
-                                <!-- Botones -->
-                                <div class="flex justify-end space-x-4">
-                                    <Link
-                                        :href="route('posts.index')"
-                                        class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded"
-                                    >
-                                        Cancelar
-                                    </Link>
-                                    <button
-                                        type="submit"
-                                        class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"
-                                        :disabled="form.processing"
-                                    >
-                                        Crear Bug
-                                    </button>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label class="label">Tecnología</label>
+                                            <input
+                                                v-model="form.technology"
+                                                type="text"
+                                                class="input"
+                                                placeholder="Ej: React 18.2.0"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label class="label">Aplicación/Módulo</label>
+                                            <input
+                                                v-model="form.application"
+                                                type="text"
+                                                class="input"
+                                                placeholder="Ej: Admin Dashboard"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label class="label">Versión</label>
+                                            <input
+                                                v-model="form.version"
+                                                type="text"
+                                                class="input"
+                                                placeholder="Ej: v2.1.0"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label class="label">Año</label>
+                                            <input
+                                                v-model="form.year"
+                                                type="text"
+                                                class="input"
+                                                placeholder="Ej: 2024"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
+                            </div>
+
+                            <!-- Buttons with enhanced gradients -->
+                            <div class="flex justify-end space-x-4 pt-6">
+                                <Link
+                                    :href="route('posts.index')"
+                                    class="btn btn-secondary"
+                                >
+                                    Cancelar
+                                </Link>
+                                <button
+                                    type="submit"
+                                    class="btn btn-primary"
+                                    :disabled="form.processing"
+                                >
+                                    <span v-if="form.processing">
+                                        Guardando...
+                                    </span>
+                                    <span v-else>
+                                        Reportar Bug 🚀
+                                    </span>
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -157,30 +161,81 @@
 </template>
 
 <script setup>
-import { Link, useForm } from '@inertiajs/vue3';
-import AppLayout from '@/Layouts/AppLayout.vue';
+import { Link, useForm } from '@inertiajs/vue3'
+import AppLayout from '@/Layouts/AppLayout.vue'
 
+// Props
 const props = defineProps({
     categories: Array
-});
+})
 
+// Form con valores por defecto
 const form = useForm({
     title: '',
     description: '',
     category_id: '',
-    priority: 'medium',
+    priority: '',
     technology: '',
     application: '',
     version: '',
-    year: ''
-});
+    year: new Date().getFullYear().toString() // año actual por defecto
+})
 
-const submit = () => {
+// Submit handler
+const submitBug = () => {
     form.post(route('posts.store'), {
         preserveScroll: true,
         onSuccess: () => {
-            form.reset();
+            // TODO: Mostrar toast de éxito
+            form.reset()
         },
-    });
-};
-</script> 
+    })
+}
+</script>
+
+<style scoped>
+.label {
+    @apply block text-sm font-medium text-white/60 mb-1;
+}
+
+.input {
+    @apply w-full bg-purple-900/20 border border-purple-500/5 rounded-lg px-4 py-2.5 
+        text-white/80 placeholder-white/30
+        focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/20 
+        hover:bg-purple-900/30 transition-all duration-300;
+}
+
+.input.error {
+    @apply border-red-500/30 focus:ring-red-500/20 focus:border-red-500/20;
+}
+
+.error-text {
+    @apply mt-1 text-sm text-red-400/80;
+}
+
+.btn {
+    @apply px-6 py-2.5 rounded-lg font-medium transition-all duration-300
+        disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-primary {
+    @apply bg-gradient-to-r from-purple-500/80 via-blue-500/80 to-purple-500/80 
+        text-white/90 hover:from-purple-500/90 hover:via-blue-500/90 hover:to-purple-500/90
+        hover:shadow-lg hover:shadow-purple-500/10;
+}
+
+.btn-secondary {
+    @apply bg-purple-500/5 text-white/70
+        hover:bg-purple-500/10 hover:text-white/80;
+}
+
+/* Animación del pulso más suave */
+@keyframes subtle-pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 0.3; }
+}
+
+.animate-subtle-pulse {
+    animation: subtle-pulse 3s ease-in-out infinite;
+}
+</style> 

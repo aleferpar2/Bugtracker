@@ -2,13 +2,14 @@
 
 namespace App\Notifications;
 
-use App\Models\Solution;
+use App\Models\Post;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class NewSolutionNotification extends Notification implements ShouldQueue
+class PostAssignedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -16,7 +17,10 @@ class NewSolutionNotification extends Notification implements ShouldQueue
      * Create a new notification instance.
      */
     public function __construct(
-        public Solution $solution
+        public Post $post,
+        public ?User $oldAssignee,
+        public ?User $newAssignee,
+        public string $message
     ) {}
 
     /**
@@ -26,7 +30,7 @@ class NewSolutionNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['database']; // Solo base de datos, sin email por ahora
+        return ['database'];
     }
 
     /**
@@ -35,10 +39,9 @@ class NewSolutionNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Nueva solución propuesta para tu post')
-            ->line('Se ha propuesto una nueva solución para tu post: ' . $this->solution->post->title)
-            ->line('Solución: ' . $this->solution->description)
-            ->action('Ver solución', route('posts.show', $this->solution->post))
+            ->subject('Cambio de asignación en post')
+            ->line($this->message)
+            ->action('Ver post', route('posts.show', $this->post))
             ->line('Gracias por usar nuestra aplicación!');
     }
 
@@ -50,12 +53,13 @@ class NewSolutionNotification extends Notification implements ShouldQueue
     public function toArray(object $notifiable): array
     {
         return [
-            'solution_id' => $this->solution->id,
-            'post_id' => $this->solution->post_id,
-            'post_title' => $this->solution->post->title,
-            'user_id' => $this->solution->user_id,
-            'user_name' => $this->solution->user->name,
-            'message' => 'Nueva solución propuesta para tu post: ' . $this->solution->post->title,
+            'post_id' => $this->post->id,
+            'post_title' => $this->post->title,
+            'old_assignee_id' => $this->oldAssignee?->id,
+            'old_assignee_name' => $this->oldAssignee?->name,
+            'new_assignee_id' => $this->newAssignee?->id,
+            'new_assignee_name' => $this->newAssignee?->name,
+            'message' => $this->message,
         ];
     }
-} 
+}
