@@ -1,7 +1,7 @@
 # 🐞 BGT - Bug Tracker
 
 <div align="center">
-  <img src="imagen/ChatGPT Image 5 jun 2025, 13_31_05.png" alt="BGT Logo" width="300"/>
+  <img src="imagenes/LogoBGT.png" alt="BGT Logo" width="300"/>
 </div>
 
 ## 📝 Descripción
