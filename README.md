@@ -10,8 +10,10 @@ BGT (Bug Tracker) es una aplicación web moderna diseñada para el seguimiento y
 
 ## 🔗 Enlaces
 
-- [GitHub](TU_LINK_AQUI)
-- [Presentación del Proyecto](TU_LINK_DE_CANVA_AQUI)
+- [GitHub](https://github.com/aleferpar2/Bugtracker)^
+- [Bugtracker Producción](https://bugtracker-master-alytx5.laravel.cloud/)
+- [Presentación del Proyecto](https://www.canva.com/design/DAGp2TfdRek/K-CVjpB1Vdt6JCWzWmFm6Q/edit)
+- 
 
 ## 🛠️ Tecnologías Utilizadas
 
@@ -46,8 +48,6 @@ php artisan key:generate
 
 5. Configura la base de datos en MySQL
 ```bash
-# Crea una base de datos en MySQL
-# Actualiza las credenciales en el archivo .env:
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
@@ -83,7 +83,3 @@ sudo a2enmod rewrite
 - Sistema de comentarios y soluciones
 - Notificaciones en tiempo real
 - Interfaz responsive y moderna
-
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para más detalles.
