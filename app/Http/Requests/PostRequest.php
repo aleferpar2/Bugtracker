@@ -33,7 +33,7 @@ class PostRequest extends FormRequest
             'status' => ['required', 'string', 'in:' . implode(',', array_keys(Post::STATUSES))],
             'priority' => ['required', 'string', 'in:' . implode(',', array_keys(Post::PRIORITIES))],
             'assigned_to' => ['nullable', 'exists:users,id'],
-            'categories' => ['required', 'array', 'min:1'],
+            'categories' => ['nullable', 'array'],
             'categories.*' => ['exists:categories,id']
         ];
 
@@ -65,8 +65,7 @@ class PostRequest extends FormRequest
             'priority.required' => 'La prioridad es obligatoria.',
             'priority.in' => 'La prioridad seleccionada no es válida.',
             'assigned_to.exists' => 'El usuario asignado no existe.',
-            'categories.required' => 'Debes seleccionar al menos una categoría.',
-            'categories.min' => 'Debes seleccionar al menos una categoría.',
+            'categories.exists' => 'Una de las categorías seleccionadas no existe.',
             'categories.*.exists' => 'Una de las categorías seleccionadas no existe.'
         ];
     }

@@ -110,7 +110,7 @@ class PostController extends Controller
         $data = $request->validate([
             'title' => 'required|string|max:255|unique:posts',
             'description' => 'required|string|min:10',
-            'category_id' => 'required|exists:categories,id',
+            'category_id' => 'nullable|exists:categories,id',
             'priority' => 'required|in:low,medium,high,critical',
             'technology' => 'nullable|string|max:100',
             'application' => 'nullable|string|max:100',
@@ -124,7 +124,9 @@ class PostController extends Controller
             'user_id' => auth()->id(),
         ]);
 
-        $post->categories()->attach($data['category_id']);
+        if (isset($data['category_id'])) {
+            $post->categories()->attach($data['category_id']);
+        }
 
         return redirect()
             ->route('posts.show', $post)

@@ -46,7 +46,6 @@
                                     <select
                                         v-model="form.category_id"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        required
                                     >
                                         <option value="">Selecciona una categoría</option>
                                         <option v-for="category in categories" :key="category.id" :value="category.id">

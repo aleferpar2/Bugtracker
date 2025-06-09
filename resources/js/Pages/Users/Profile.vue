@@ -14,6 +14,7 @@
                         <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
                             <div class="p-6">
                                 <form @submit.prevent="updateProfile">
+                                    <input type="hidden" name="_method" value="PATCH">
                                     <div class="space-y-6">
                                         <!-- Foto de perfil -->
                                         <div class="flex items-center space-x-4">
@@ -193,7 +194,7 @@ function onPhotoChange(e) {
 }
 
 function updateProfile() {
-    form.post(route('profile.update'), {
+    form.patch(route('profile.update'), {
         preserveScroll: true,
         onSuccess: () => {
             form.reset('password', 'password_confirmation', 'photo');
