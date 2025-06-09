@@ -1,10 +1,85 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
-![ChatGPT Image 5 jun 2025, 13_31_05](https://github.com/user-attachments/assets/b7c5d0d3-a28d-4b69-91ed-038c60905d75)
+# 🐞 BGT - Bug Tracker
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+<div align="center">
+  <img src="imagen/ChatGPT Image 5 jun 2025, 13_31_05.png" alt="BGT Logo" width="300"/>
+</div>
 
+## 📝 Descripción
+
+BGT (Bug Tracker) es una aplicación web moderna diseñada para el seguimiento y gestión eficiente de errores en proyectos de desarrollo. Integra búsqueda local en base de datos y búsqueda avanzada con la API de StackOverflow, permitiendo a los desarrolladores encontrar y solucionar problemas de manera más efectiva. La aplicación está construida con Laravel y Vue.js, ofreciendo una experiencia de usuario fluida y responsive.
+
+## 🔗 Enlaces
+
+- [GitHub](TU_LINK_AQUI)
+- [Presentación del Proyecto](TU_LINK_DE_CANVA_AQUI)
+
+## 🛠️ Tecnologías Utilizadas
+
+- **Frontend**: Vue.js 3, Tailwind CSS, Inertia.js
+- **Backend**: Laravel 10, PHP 8.2
+- **Base de Datos**: MySQL
+- **Servidor**: Apache
+- **APIs**: StackOverflow API
+
+## 🚀 Instalación Local
+
+1. Clona el repositorio
+```bash
+git clone [tu-repositorio]
+```
+
+2. Instala las dependencias de PHP
+```bash
+composer install
+```
+
+3. Instala las dependencias de Node.js
+```bash
+npm install
+```
+
+4. Configura el archivo .env
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+
+5. Configura la base de datos en MySQL
+```bash
+# Crea una base de datos en MySQL
+# Actualiza las credenciales en el archivo .env:
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=bugtracker
+DB_USERNAME=tu_usuario
+DB_PASSWORD=tu_contraseña
+```
+
+6. Ejecuta las migraciones
+```bash
+php artisan migrate
+```
+
+7. Compila los assets
+```bash
+npm run dev
+```
+
+8. Configura Apache
+- Asegúrate de que Apache está instalado y funcionando
+- Configura un virtual host apuntando al directorio `/public` del proyecto
+- Habilita el módulo rewrite de Apache:
+```bash
+sudo a2enmod rewrite
+```
+
+## 🌟 Características Principales
+
+- Sistema de autenticación y roles
+- Gestión de bugs y seguimiento
+- Búsqueda local en base de datos
+- Búsqueda avanzada integrada con StackOverflow
+- Sistema de comentarios y soluciones
+- Notificaciones en tiempo real
+- Interfaz responsive y moderna
