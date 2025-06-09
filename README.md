@@ -10,7 +10,7 @@ BGT (Bug Tracker) es una aplicación web moderna diseñada para el seguimiento y
 
 ## 🔗 Enlaces
 
-- [GitHub](https://github.com/aleferpar2/Bugtracker)^
+- [GitHub](https://github.com/aleferpar2/Bugtracker)
 - [Bugtracker Producción](https://bugtracker-master-alytx5.laravel.cloud/)
 - [Presentación del Proyecto](https://www.canva.com/design/DAGp2TfdRek/K-CVjpB1Vdt6JCWzWmFm6Q/edit)
 - 
