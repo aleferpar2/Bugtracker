@@ -194,7 +194,20 @@ function onPhotoChange(e) {
 }
 
 function updateProfile() {
+    // Solo enviar los campos que han sido modificados
+    const data = {};
+    
+    if (form.name !== props.user.name) data.name = form.name;
+    if (form.email !== props.user.email) data.email = form.email;
+    if (form.bio !== (props.user.bio || '')) data.bio = form.bio;
+    if (form.password) {
+        data.password = form.password;
+        data.password_confirmation = form.password_confirmation;
+    }
+    if (form.photo) data.photo = form.photo;
+
     form.patch(route('profile.update'), {
+        ...data,
         preserveScroll: true,
         onSuccess: () => {
             form.reset('password', 'password_confirmation', 'photo');

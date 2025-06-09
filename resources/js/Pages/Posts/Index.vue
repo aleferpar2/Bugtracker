@@ -2,6 +2,19 @@
     <AppLayout title="Bugs">
         <div class="min-h-screen bg-white py-12">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <!-- Header con botón de crear -->
+                <div class="flex justify-between items-center mb-8">
+                    <h1 class="text-3xl font-bold text-gray-900">Bugs Reportados</h1>
+                    <Link
+                        v-if="can.create"
+                        :href="route('posts.create')"
+                        class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-sm transition-colors duration-200"
+                    >
+                        <span class="mr-2">🐞</span>
+                        Reportar Nuevo Bug
+                    </Link>
+                </div>
+
                 <!-- Stats Cards -->
                 <div class="grid grid-cols-4 gap-6 mb-12">
                     <!-- Total -->
