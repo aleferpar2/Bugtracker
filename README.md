@@ -8,12 +8,6 @@
 
 BGT (Bug Tracker) es una aplicación web moderna diseñada para el seguimiento y gestión eficiente de errores en proyectos de desarrollo. Integra búsqueda local en base de datos y búsqueda avanzada con la API de StackOverflow, permitiendo a los desarrolladores encontrar y solucionar problemas de manera más efectiva. La aplicación está construida con Laravel y Vue.js, ofreciendo una experiencia de usuario fluida y responsive.
 
-## 🔗 Enlaces
-
-- [GitHub](https://github.com/aleferpar2/Bugtracker)
-- [Bugtracker Producción](https://bugtracker-master-alytx5.laravel.cloud/)
-- [Presentación del Proyecto](https://www.canva.com/design/DAGp2TfdRek/K-CVjpB1Vdt6JCWzWmFm6Q/edit)
-- 
 
 ## 🛠️ Tecnologías Utilizadas
 
@@ -83,3 +77,10 @@ sudo a2enmod rewrite
 - Sistema de comentarios y soluciones
 - Notificaciones en tiempo real
 - Interfaz responsive y moderna
+
+## 🔗 Enlaces
+
+- [GitHub](https://github.com/aleferpar2/Bugtracker)
+- [Bugtracker Producción](https://bugtracker-master-alytx5.laravel.cloud/)
+- [Presentación del Proyecto](https://www.canva.com/design/DAGp2TfdRek/K-CVjpB1Vdt6JCWzWmFm6Q/edit)
+- 
