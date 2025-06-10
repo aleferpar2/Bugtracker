@@ -1,159 +1,147 @@
 <template>
-    <AppLayout title="Nuevo Bug">
-        <div class="min-h-screen bg-gradient-to-br from-purple-800 via-purple-900 to-purple-950 py-12">
-            <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-                <!-- Header -->
+    <AppLayout>
+        <div class="min-h-screen bg-white py-12">
+            <div class="max-w-4xl mx-auto px-4">
+                <!-- Encabezado con degradado en el texto -->
                 <div class="text-center mb-8">
-                    <h1 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-purple-300">
-                        Reportar Bug 🐛
+                    <h1 class="text-3xl font-bold mb-2 flex items-center justify-center gap-2">
+                        <span class="bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-transparent">
+                            Reportar Bug
+                        </span>
+                        <span class="text-2xl">🐛</span>
                     </h1>
-                    <p class="mt-2 text-purple-300/70">
-                        Ayúdanos a mejorar describiendo el problema en detalle
-                    </p>
+                    <p class="text-gray-600">Ayúdanos a mejorar describiendo el problema en detalle</p>
                 </div>
 
-                <!-- Form card with enhanced effects -->
-                <div class="relative group">
-                    <!-- Multi-layer glow effect -->
-                    <div class="absolute -inset-0.5 bg-gradient-to-r from-purple-400/10 via-blue-400/5 to-purple-400/10 rounded-xl blur-md opacity-75"></div>
-                    <div class="absolute -inset-0.5 bg-gradient-to-r from-purple-500/5 to-blue-500/5 rounded-xl blur-lg opacity-50 animate-pulse"></div>
-                    
-                    <div class="relative bg-purple-950/30 backdrop-blur-md border border-purple-500/5 rounded-xl p-6 shadow-lg">
-                        <form @submit.prevent="submitBug" class="space-y-6">
-                            <!-- Form fields with improved styling -->
-                            <div>
-                                <label class="label">Título del Bug</label>
-                                <input
-                                    v-model="form.title"
-                                    type="text"
-                                    class="input"
-                                    placeholder="Ej: App crashea al subir fotos PNG"
-                                    :class="{ 'error': form.errors.title }"
-                                />
-                                <p v-if="form.errors.title" class="error-text">{{ form.errors.title }}</p>
+                <!-- Formulario con sombra y borde gradiente -->
+                <div class="bg-white rounded-xl p-8 relative
+                          shadow-[0_0_15px_rgba(168,85,247,0.1)]
+                          before:content-[''] before:absolute before:inset-0 before:-z-10
+                          before:p-[1px] before:bg-gradient-to-r before:from-purple-500/50 before:via-purple-400/50 before:to-purple-300/50
+                          before:rounded-xl before:blur-sm">
+                    <form @submit.prevent="submit" class="space-y-6">
+                        <!-- Campos con efectos mejorados -->
+                        <div class="group">
+                            <label class="block text-gray-700 text-sm font-medium mb-2">Título del Bug</label>
+                            <input 
+                                v-model="form.title"
+                                type="text"
+                                placeholder="Ej: App crashea al subir fotos PNG"
+                                class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg
+                                       shadow-[0_0_0_1px_rgba(168,85,247,0.05)]
+                                       focus:shadow-[0_0_0_4px_rgba(168,85,247,0.1)]
+                                       focus:border-purple-400
+                                       group-hover:border-purple-300
+                                       transition-all duration-300"
+                            >
+                        </div>
+
+                        <!-- Descripción con efectos similares -->
+                        <div class="group">
+                            <label class="block text-gray-700 text-sm font-medium mb-2">Descripción</label>
+                            <textarea 
+                                v-model="form.description"
+                                rows="4"
+                                placeholder="Describe el problema, pasos para reproducirlo, y comportamiento esperado..."
+                                class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg
+                                       shadow-[0_0_0_1px_rgba(168,85,247,0.05)]
+                                       focus:shadow-[0_0_0_4px_rgba(168,85,247,0.1)]
+                                       focus:border-purple-400
+                                       group-hover:border-purple-300
+                                       transition-all duration-300"
+                            ></textarea>
+                        </div>
+
+                        <!-- Categoría y Prioridad -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="group">
+                                <label class="block text-gray-700 text-sm font-medium mb-2">Categoría</label>
+                                <select 
+                                    v-model="form.category"
+                                    class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900
+                                           focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20
+                                           group-hover:border-purple-200 transition-all duration-300"
+                                >
+                                    <option value="" disabled>Selecciona una categoría</option>
+                                    <option v-for="category in categories" :key="category.id" :value="category.id">
+                                        {{ category.name }}
+                                    </option>
+                                </select>
                             </div>
-
-                            <div>
-                                <label class="label">Descripción</label>
-                                <textarea
-                                    v-model="form.description"
-                                    rows="4"
-                                    class="input"
-                                    placeholder="Describe el problema, pasos para reproducirlo, y comportamiento esperado..."
-                                    :class="{ 'error': form.errors.description }"
-                                ></textarea>
-                                <p v-if="form.errors.description" class="error-text">{{ form.errors.description }}</p>
+                            <div class="group">
+                                <label class="block text-gray-700 text-sm font-medium mb-2">Prioridad</label>
+                                <select 
+                                    v-model="form.priority"
+                                    class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900
+                                           focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20
+                                           group-hover:border-purple-200 transition-all duration-300"
+                                >
+                                    <option value="" disabled>Selecciona la prioridad</option>
+                                    <option value="low">Baja</option>
+                                    <option value="medium">Media</option>
+                                    <option value="high">Alta</option>
+                                    <option value="critical">Crítica</option>
+                                </select>
                             </div>
+                        </div>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label class="label">Categoría</label>
-                                    <select
-                                        v-model="form.category_id"
-                                        class="input"
-                                        :class="{ 'error': form.errors.category_id }"
-                                    >
-                                        <option value="">Selecciona una categoría</option>
-                                        <option v-for="cat in categories" :key="cat.id" :value="cat.id">
-                                            {{ cat.name }}
-                                        </option>
-                                    </select>
-                                    <p v-if="form.errors.category_id" class="error-text">{{ form.errors.category_id }}</p>
-                                </div>
-
-                                <div>
-                                    <label class="label">Prioridad</label>
-                                    <select
-                                        v-model="form.priority"
-                                        class="input"
-                                        :class="{ 'error': form.errors.priority }"
-                                    >
-                                        <option value="">Selecciona la prioridad</option>
-                                        <option value="low">🟢 Baja - Puede esperar</option>
-                                        <option value="medium">🟡 Media - Afecta algunas funciones</option>
-                                        <option value="high">🔴 Alta - Bloquea funcionalidad</option>
-                                        <option value="critical">💀 Crítica - Sistema caído</option>
-                                    </select>
-                                    <p v-if="form.errors.priority" class="error-text">{{ form.errors.priority }}</p>
-                                </div>
-                            </div>
-
-                            <!-- Info técnica section with gradient border -->
-                            <div class="relative">
-                                <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-purple-500/5 via-blue-500/10 to-purple-500/5"></div>
-                                <div class="pt-6">
-                                    <h3 class="text-lg font-medium text-white/80 mb-4">
-                                        Info Técnica
-                                        <span class="text-sm text-white/40">(opcional)</span>
-                                    </h3>
-
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div>
-                                            <label class="label">Tecnología</label>
-                                            <input
-                                                v-model="form.technology"
-                                                type="text"
-                                                class="input"
-                                                placeholder="Ej: React 18.2.0"
-                                            />
-                                        </div>
-
-                                        <div>
-                                            <label class="label">Aplicación/Módulo</label>
-                                            <input
-                                                v-model="form.application"
-                                                type="text"
-                                                class="input"
-                                                placeholder="Ej: Admin Dashboard"
-                                            />
-                                        </div>
-
-                                        <div>
-                                            <label class="label">Versión</label>
-                                            <input
-                                                v-model="form.version"
-                                                type="text"
-                                                class="input"
-                                                placeholder="Ej: v2.1.0"
-                                            />
-                                        </div>
-
-                                        <div>
-                                            <label class="label">Año</label>
-                                            <input
-                                                v-model="form.year"
-                                                type="text"
-                                                class="input"
-                                                placeholder="Ej: 2024"
-                                            />
-                                        </div>
+                        <!-- Info Técnica con fondo y borde gradiente sutil -->
+                        <div class="relative rounded-lg p-6 space-y-6 overflow-hidden
+                                  before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-r 
+                                  before:from-purple-50 before:to-purple-100/50 before:opacity-50">
+                            <div class="relative z-10">
+                                <h3 class="text-gray-700 font-medium flex items-center gap-2">
+                                    <span>Info Técnica</span>
+                                    <span class="text-sm text-purple-400">(opcional)</span>
+                                </h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div class="group">
+                                        <label class="block text-gray-700 text-sm font-medium mb-2">Tecnología</label>
+                                        <input 
+                                            v-model="form.technology"
+                                            type="text"
+                                            placeholder="Ej: React 18.2.0"
+                                            class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400
+                                                   focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20
+                                                   group-hover:border-purple-200 transition-all duration-300"
+                                        >
+                                    </div>
+                                    <div class="group">
+                                        <label class="block text-gray-700 text-sm font-medium mb-2">Aplicación/Módulo</label>
+                                        <input 
+                                            v-model="form.application"
+                                            type="text"
+                                            placeholder="Ej: Admin Dashboard"
+                                            class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400
+                                                   focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20
+                                                   group-hover:border-purple-200 transition-all duration-300"
+                                        >
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- Buttons with enhanced gradients -->
-                            <div class="flex justify-end space-x-4 pt-6">
-                                <Link
-                                    :href="route('posts.index')"
-                                    class="btn btn-secondary"
-                                >
-                                    Cancelar
-                                </Link>
-                                <button
-                                    type="submit"
-                                    class="btn btn-primary"
-                                    :disabled="form.processing"
-                                >
-                                    <span v-if="form.processing">
-                                        Guardando...
-                                    </span>
-                                    <span v-else>
-                                        Reportar Bug 🚀
-                                    </span>
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                        <!-- Botón con degradado como en la imagen -->
+                        <div class="flex justify-end pt-6">
+                            <button 
+                                type="submit"
+                                class="px-6 py-3 relative group overflow-hidden rounded-lg
+                                       text-white font-medium text-sm
+                                       before:content-[''] before:absolute before:inset-0
+                                       before:bg-gradient-to-b before:from-purple-500 before:to-purple-700
+                                       hover:before:opacity-90
+                                       shadow-lg shadow-purple-500/20
+                                       transform hover:scale-[1.02] active:scale-[0.98]
+                                       transition-all duration-200"
+                                :disabled="form.processing"
+                            >
+                                <span class="relative z-10 flex items-center gap-2">
+                                    <span>Reportar Bug</span>
+                                    <span class="text-xl">🐛</span>
+                                </span>
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -194,6 +182,33 @@ const submitBug = () => {
 </script>
 
 <style scoped>
+/* Efecto de brillo en el hover del botón */
+button:hover::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent,
+        rgba(255,255,255,0.1),
+        transparent
+    );
+    transform: rotate(45deg);
+    animation: shine 1.5s infinite;
+}
+
+@keyframes shine {
+    0% {
+        transform: translateX(-100%) rotate(45deg);
+    }
+    100% {
+        transform: translateX(100%) rotate(45deg);
+    }
+}
+
 .label {
     @apply block text-sm font-medium text-white/60 mb-1;
 }

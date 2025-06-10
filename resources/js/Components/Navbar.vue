@@ -179,6 +179,7 @@ import NotificationDropdown from './NotificationDropdown.vue';
 const page = usePage();
 const user = computed(() => page.props.auth?.user);
 
+// Estado del buscador
 const searchQuery = ref('');
 const showUserMenu = ref(false);
 const showMobileMenu = ref(false);
@@ -187,6 +188,7 @@ function isActive(routeName) {
   return page.url.startsWith(route(routeName, undefined, false));
 }
 
+// Función que maneja la búsqueda
 function performSearch() {
   if (searchQuery.value.trim()) {
     router.get(route('posts.index', { search: searchQuery.value }));
@@ -209,7 +211,7 @@ function logout() {
   router.post(route('logout'));
 }
 
-// Close menus when clicking outside
+
 onMounted(() => {
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.relative')) {

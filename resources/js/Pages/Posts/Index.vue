@@ -8,48 +8,64 @@
                     <Link
                         v-if="can.create"
                         :href="route('posts.create')"
-                        class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-sm transition-colors duration-200"
+                        class="relative group overflow-hidden rounded-full px-6 py-2
+                               before:content-[''] before:absolute before:inset-0
+                               before:bg-gradient-to-b before:from-purple-500 before:to-purple-700
+                               hover:before:opacity-90
+                               shadow-lg shadow-purple-500/20
+                               transform hover:scale-[1.02] active:scale-[0.98]
+                               transition-all duration-200"
                     >
-                        <span class="mr-2">🐞</span>
-                        Reportar Nuevo Bug
+                        <span class="relative z-10 flex items-center gap-2 text-white font-medium">
+                            <span class="text-xl">🐞</span>
+                            <span>Reportar Nuevo Bug</span>
+                        </span>
                     </Link>
                 </div>
 
                 <!-- Stats Cards -->
                 <div class="grid grid-cols-4 gap-6 mb-12">
                     <!-- Total -->
-                    <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border border-purple-200 hover:shadow-lg hover:shadow-purple-100/50 transition-all duration-300">
-                        <div class="flex flex-col items-center">
-                            <span class="text-2xl mb-2">🐛</span>
-                            <span class="text-3xl font-bold text-purple-700">{{ stats.total }}</span>
-                            <span class="text-sm text-purple-600">Total</span>
+                    <div class="bg-red-500 rounded-xl p-6 flex items-center justify-between shadow-lg hover:shadow-xl transition-all duration-300">
+                        <div class="flex items-center">
+                            <span class="text-2xl mr-3">🐞</span>
+                            <div>
+                                <h3 class="text-white/70 text-sm">Total Bugs</h3>
+                                <p class="text-white text-2xl font-bold">{{ stats.total }}</p>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Resueltos -->
-                    <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 border border-green-200 hover:shadow-lg hover:shadow-green-100/50 transition-all duration-300">
-                        <div class="flex flex-col items-center">
-                            <span class="text-2xl mb-2">✅</span>
-                            <span class="text-3xl font-bold text-green-700">{{ stats.resolved }}</span>
-                            <span class="text-sm text-green-600">Resueltos</span>
+                    <div class="bg-green-500 rounded-xl p-6 flex items-center justify-between shadow-lg hover:shadow-xl transition-all duration-300">
+                        <div class="flex items-center">
+                            <span class="text-2xl mr-3">✅</span>
+                            <div>
+                                <h3 class="text-white/70 text-sm">Resueltos</h3>
+                                <p class="text-white text-2xl font-bold">{{ stats.resolved }}</p>
+                            </div>
                         </div>
                     </div>
 
                     <!-- En Progreso -->
-                    <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-6 border border-yellow-200 hover:shadow-lg hover:shadow-yellow-100/50 transition-all duration-300">
-                        <div class="flex flex-col items-center">
-                            <span class="text-2xl mb-2">⚡</span>
-                            <span class="text-3xl font-bold text-yellow-700">{{ stats.in_progress }}</span>
-                            <span class="text-sm text-yellow-600">En Progreso</span>
+                    <div class="bg-yellow-500 rounded-xl p-6 flex items-center justify-between shadow-lg hover:shadow-xl transition-all duration-300">
+                        <div class="flex items-center">
+                            <span class="text-2xl mr-3">⚡</span>
+                            <div>
+                                <h3 class="text-white/70 text-sm">En Progreso</h3>
+                                <p class="text-white text-2xl font-bold">{{ stats.in_progress }}</p>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Abiertos -->
-                    <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-6 border border-red-200 hover:shadow-lg hover:shadow-red-100/50 transition-all duration-300">
-                        <div class="flex flex-col items-center">
-                            <span class="text-2xl mb-2">🆘</span>
-                            <span class="text-3xl font-bold text-red-700">{{ stats.open }}</span>
-                            <span class="text-sm text-red-600">Abiertos</span>
+                    <div class="bg-red-400 rounded-xl p-6 flex items-center justify-between shadow-lg hover:shadow-xl transition-all duration-300">
+                        <div class="flex items-center">
+                            <span class="text-2xl mr-3">🆘</span>
+                            <div>
+                                <h3 class="text-white/70 text-sm">Abiertos</h3>
+                                <p class="text-white text-2xl font-bold">{{ stats.open }}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -200,5 +216,32 @@ const priorityText = (priority) => ({
 .animate-gradient {
     animation: gradient 3s ease infinite;
     background-size: 200% 200%;
+}
+
+/* Efecto de brillo en el hover del botón */
+.group:hover::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent,
+        rgba(255,255,255,0.1),
+        transparent
+    );
+    transform: rotate(45deg);
+    animation: shine 1.5s infinite;
+}
+
+@keyframes shine {
+    0% {
+        transform: translateX(-100%) rotate(45deg);
+    }
+    100% {
+        transform: translateX(100%) rotate(45deg);
+    }
 }
 </style> 

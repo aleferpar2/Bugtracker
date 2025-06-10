@@ -18,15 +18,13 @@ class PostController extends Controller
     // TODO: Implementar cache para optimizar queries frecuentes
     // FIXME: La paginación está rota en móvil 🤔
     
-    /**
-     * Display a listing of the resource.
-     */
+  
     public function index(Request $request)
     {
-        // Get posts con sus relaciones (optimizar esto después)
+        // Consulta base con relaciones necesarias
         $query = Post::with(['user', 'categories', 'solutions']);
 
-        // Búsqueda y filtros 🔍
+        // Búsqueda SQL en título y descripción
         if ($request->search) {
             $query->where(fn($q) => 
                 $q->where('title', 'like', "%{$request->search}%")
@@ -34,15 +32,15 @@ class PostController extends Controller
             );
         }
 
-        // Filtro por categoría (si existe)
+        // Filtro por categoría
         $request->category && $query->whereHas('categories', 
             fn($q) => $q->where('categories.id', $request->category)
         );
 
-        // Status filter
+        // Filtro por estado del bug
         $request->status && $query->where('status', $request->status);
 
-        // Sort posts - maybe add more options later?
+        // Ordenamiento de resultados
         match($request->sort ?? 'latest') {
             'oldest' => $query->oldest(),
             'most_voted' => $query->orderBy('votes_count', 'desc'),
@@ -51,7 +49,7 @@ class PostController extends Controller
             default => $query->latest()
         };
 
-        // Transform posts para el frontend
+        // Transformación de datos para el frontend
         $posts = $query->get()->map(fn($post) => [
             'id' => $post->id,
             'title' => $post->title,
@@ -74,14 +72,15 @@ class PostController extends Controller
             'created_at' => $post->created_at
         ]);
 
-        // Quick stats para el dashboard
+        // Estadísticas rápidas
         $stats = [
-            'total' => Post::count(), // cachear esto después
+            'total' => Post::count(),
             'resolved' => Post::where('status', 'resolved')->count(),
             'in_progress' => Post::where('status', 'in_progress')->count(),
             'open' => Post::where('status', 'open')->count(),
         ];
 
+        // Retorna vista con datos
         return Inertia::render('Posts/Index', [
             'posts' => $posts,
             'categories' => Category::select('id', 'name')->get(),
@@ -91,9 +90,7 @@ class PostController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+  
     public function create()
     {
         return Inertia::render('Posts/Create', [
@@ -102,9 +99,7 @@ class PostController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -133,9 +128,7 @@ class PostController extends Controller
             ->with('success', 'Bug reportado correctamente');
     }
 
-    /**
-     * Display the specified resource.
-     */
+
     public function show(Post $post)
     {
         $post->load(['user', 'categories', 'comments.user', 'solutions.user']);
@@ -157,17 +150,13 @@ class PostController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+
     public function edit(string $id)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+  
     public function update(PostRequest $request, string $id)
     {
         $post = Post::findOrFail($id);
@@ -191,10 +180,7 @@ class PostController extends Controller
         return redirect()->route('posts.show', $post)
             ->with('success', 'Post actualizado exitosamente.');
     }
-
-    /**
-     * Remove the specified resource from storage.
-     */
+    //terminar mas tarde sistema de borrado
     public function destroy(string $id)
     {
         //

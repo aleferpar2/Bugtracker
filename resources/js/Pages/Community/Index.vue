@@ -5,9 +5,18 @@
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">Blogs de la Comunidad</h2>
         <Link
           :href="route('community.create')"
-          class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150"
+          class="relative group overflow-hidden rounded-full px-6 py-2
+                 before:content-[''] before:absolute before:inset-0
+                 before:bg-gradient-to-b before:from-purple-500 before:to-purple-700
+                 hover:before:opacity-90
+                 shadow-lg shadow-purple-500/20
+                 transform hover:scale-[1.02] active:scale-[0.98]
+                 transition-all duration-200"
         >
-          Crear Nuevo Blog
+          <span class="relative z-10 flex items-center gap-2 text-white font-medium">
+            <span class="text-xl">💭</span>
+            <span>Crear Nuevo Blog</span>
+          </span>
         </Link>
       </div>
     </template>
@@ -155,5 +164,32 @@ watch([search, selectedCategory, sortBy], () => {
 <style scoped>
 .topic-link:hover {
   text-decoration: none;
+}
+
+/* Efecto de brillo en el hover del botón */
+.group:hover::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent,
+        rgba(255,255,255,0.1),
+        transparent
+    );
+    transform: rotate(45deg);
+    animation: shine 1.5s infinite;
+}
+
+@keyframes shine {
+    0% {
+        transform: translateX(-100%) rotate(45deg);
+    }
+    100% {
+        transform: translateX(100%) rotate(45deg);
+    }
 }
 </style> 
